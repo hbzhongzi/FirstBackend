@@ -1,0 +1,22 @@
+<IfModule mod_rewrite.c>
+    Options -MultiViews
+    RewriteEngine On
+
+    # Apache + mod_fcgid 默认可能不把 Authorization 传给 PHP。
+    # 内部重写后变量可能变为 REDIRECT_HTTP_AUTHORIZATION，PHP 侧会兼容读取。
+    RewriteCond %{HTTP:Authorization} ^(.+)$
+    RewriteRule ^ - [E=HTTP_AUTHORIZATION:%1]
+
+    # 已存在的静态文件和目录直接交给 Web 服务器处理。
+    RewriteCond %{REQUEST_FILENAME} -f [OR]
+    RewriteCond %{REQUEST_FILENAME} -d
+    RewriteRule ^ - [L]
+
+    # 其余请求统一交给 ThinkPHP 入口。
+    # 使用 ThinkPHP 默认的 s 参数传递 PATH_INFO，兼容 Apache + PHP-FPM。
+    # 直接改写为 index.php/xxx 会被部分 PHP-CGI 解释为不存在的脚本。
+    RewriteRule ^(.*)$ index.php?s=/$1 [QSA,L]
+</IfModule>
+
+# 禁止目录列表，避免误暴露运行目录内容。
+Options -Indexes

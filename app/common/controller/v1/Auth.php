@@ -15,7 +15,10 @@ final class Auth extends BaseController
     public function wechatLogin(): Json
     {
         $input = $this->request->post(false);
-        if (!is_array($input) || trim((string) ($input['code'] ?? '')) === '') {
+        if (!is_array($input) || trim((string) ($input['appid'] ?? '')) === '') {
+            throw new BusinessException('小程序 AppID 不能为空', 42200, 422);
+        }
+        if (trim((string) ($input['code'] ?? '')) === '') {
             throw new BusinessException('微信登录 code 不能为空', 42200, 422);
         }
 
@@ -38,6 +41,14 @@ final class Auth extends BaseController
     public function logout(): Json
     {
         $token = trim((string) $this->request->header('authorization', ''));
+        if ($token === '') {
+            foreach (['HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION'] as $key) {
+                $token = trim((string) $this->request->server($key, ''));
+                if ($token !== '') {
+                    break;
+                }
+            }
+        }
         if (preg_match('/^Bearer\s+(.+)$/i', $token, $matches)) {
             $token = trim($matches[1]);
         } else {

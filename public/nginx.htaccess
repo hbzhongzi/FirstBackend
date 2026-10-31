@@ -1,0 +1,12 @@
+# Nginx 不读取 .htaccess 文件；此文件仅保留等价配置片段，供 PHPStudy/Nginx 配置参考。
+# 站点 root 必须指向项目的 public/ 目录。
+#
+# location / {
+#     try_files $uri $uri/ /index.php?$query_string;
+# }
+#
+# location ~ \.php$ {
+#     include fastcgi_params;
+#     fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+#     fastcgi_pass 127.0.0.1:9000;
+# }

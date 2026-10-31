@@ -36,4 +36,26 @@ final class MiniProgramContext
 
         return $program;
     }
+
+    public static function recordByAppid(Request $request, string $appid): MiniProgram
+    {
+        $appid = trim($appid);
+        if ($appid === '') {
+            throw new BusinessException('小程序 AppID 不能为空', 42200, 422);
+        }
+
+        $program = MiniProgram::where('appid', $appid)
+            ->where('status', 1)
+            ->find();
+
+        if (!$program) {
+            throw new BusinessException('小程序 AppID 未注册或已停用', 40401, 404);
+        }
+
+        if ($program->program_key !== self::key($request)) {
+            throw new BusinessException('小程序 AppID 与接口项目不匹配', 42200, 422);
+        }
+
+        return $program;
+    }
 }

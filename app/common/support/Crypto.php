@@ -25,6 +25,25 @@ final class Crypto
         return base64_encode($iv . $tag . $ciphertext);
     }
 
+    public static function decrypt(string $value): string
+    {
+        $payload = base64_decode($value, true);
+        if ($payload === false || strlen($payload) < 29) {
+            throw new RuntimeException('敏感数据密文格式无效');
+        }
+
+        $iv = substr($payload, 0, 12);
+        $tag = substr($payload, 12, 16);
+        $ciphertext = substr($payload, 28);
+        $plaintext = openssl_decrypt($ciphertext, 'aes-256-gcm', self::key(true), OPENSSL_RAW_DATA, $iv, $tag);
+
+        if ($plaintext === false) {
+            throw new RuntimeException('敏感数据解密失败');
+        }
+
+        return $plaintext;
+    }
+
     private static function key(bool $binary = false): string
     {
         $configured = trim((string) env('APP_KEY', ''));

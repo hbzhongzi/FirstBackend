@@ -24,9 +24,8 @@ final class AuthService
 
     public function login(Request $request, array $input): array
     {
-        $program = MiniProgramContext::record($request);
-        $config = MiniProgramContext::fromRequest($request);
-        $wechatUser = $this->wechat->codeLogin($config, (string) $input['code']);
+        $program = MiniProgramContext::recordByAppid($request, (string) ($input['appid'] ?? ''));
+        $wechatUser = $this->wechat->codeLogin($program, (string) $input['code']);
         $openidHash = Crypto::hash($wechatUser['openid']);
 
         return Db::transaction(function () use ($request, $program, $input, $wechatUser, $openidHash): array {

@@ -9,15 +9,16 @@ return [
     // 是否开启路由延迟解析
     'url_lazy_route'        => false,
     // 是否强制使用路由
-    'url_route_must'        => false,
+    // API 项目只允许访问已注册路由，避免未匹配请求回退到不存在的 app\controller\Index。
+    'url_route_must'        => true,
     // 是否区分大小写
     'url_case_sensitive'    => false,
     // 自动扫描子目录分组
     'route_auto_group'      => false,
     // 合并路由规则
     'route_rule_merge'      => false,
-    // 路由是否完全匹配
-    'route_complete_match'  => false,
+    // API 路由必须完整匹配，避免 /food-book 抢先匹配 /food-book/<foodId>
+    'route_complete_match'  => true,
     // 去除斜杠
     'remove_slash'          => false,
     // 默认的路由变量规则

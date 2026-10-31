@@ -133,12 +133,13 @@ HTTP 状态表达协议层结果，业务 `code` 表达客户端可处理的错�
 
 ### 4.3 `POST /auth/wechat-login`
 
-使用微信小程序 `wx.login` / `uni.login` 返回的临时 `code` 登录。服务端根据路由项目配置调用微信 `jscode2session`，并将 `(program_id, openid)` 映射到项目用户。
+使用微信小程序 `wx.login` / `uni.login` 返回的临时 `code` 登录。服务端根据路由项目配置，通过 `w7corp/easywechat` 的小程序适配器调用微信 `jscode2session`，并将 `(program_id, openid)` 映射到项目用户。
 
 请求体：
 
 ```json
 {
+  "appid": "微信小程序公开 AppID",
   "code": "微信临时登录 code",
   "device_id": "可选，客户端生成的设备标识",
   "nickname": "可选，首次登录资料",
@@ -148,6 +149,8 @@ HTTP 状态表达协议层结果，业务 `code` 表达客户端可处理的错�
 
 规则：
 
+- `appid` 必填，服务端按数据库 `sys_mini_program.appid` 查询启用项目，并校验其 `program_key` 与 URL 项目一致；`program_id`、AppSecret 不由客户端提交。
+- `sys_mini_program.secret_ciphertext` 必须由 `php database/set_mini_program_secret.php <appid> <appsecret>` 写入，不能直接保存明文；密文无法解密时返回 `50000`，微信网络或上游服务异常时返回 `50300`。
 - `code` 必填、一次性使用，服务端不记录明文 `session_key`。
 - 昵称和头像只能作为展示资料，不能作为身份凭据；资料更新必须经过字段白名单和长度校验。
 - 登录接口必须限流、记录脱敏登录日志，并处理微信超时、重复 code 和账号已停用。
@@ -269,7 +272,8 @@ HTTP 状态表达协议层结果，业务 `code` 表达客户端可处理的错�
 | `id` | BIGINT UNSIGNED | PK | 内部项目 ID |
 | `program_key` | VARCHAR(64) | UNIQUE, NOT NULL | URL/代码中的稳定标识 |
 | `name` | VARCHAR(128) | NOT NULL | 展示名称 |
-| `appid` | VARCHAR(64) | UNIQUE, NOT NULL | 微信 AppID，不存 AppSecret |
+| `appid` | VARCHAR(64) | UNIQUE, NOT NULL | 微信 AppID，作为登录项目筛选条件 |
+| `secret_ciphertext` | VARBINARY(1024) | NULL | 使用 `APP_KEY` 加密的 AppSecret，不保存明文 |
 | `status` | TINYINT | DEFAULT 1 | `1` 启用，`0` 停用 |
 | `config_ref` | VARCHAR(128) | NULL | 密钥管理系统引用 |
 | `created_at` | DATETIME | NOT NULL | 创建时间 |
@@ -369,7 +373,7 @@ HTTP 状态表达协议层结果，业务 `code` 表达客户端可处理的错�
 3. 建立 `sys_user_token`，确定 access/refresh 生命周期、轮换和撤销策略后再开放刷新接口。
 4. 建立 `sys_file`，接入文件类型检查、内容安全检查和对象存储清理任务。
 5. 建立 `sys_login_log`，接入请求 ID、限流和脱敏日志。
-6. 为每次表结构变更提供 migration、回滚说明和跨版本兼容策略；当前仓库提供 `database/migrations/` 与 `database/migrate.php`，公共表字段注释由 `202610300002_add_public_column_comments` 维护，新增变更不得修改已执行迁移。
+6. 为每次表结构变更提供 migration、回滚说明和跨版本兼容策略；当前仓库提供 `database/migrations/` 与 `database/migrate.php`，业务模块使用 `202610300002_create_food_module`，新增变更不得修改已执行迁移。
 
 ## 8. 实现拆分建议
 

@@ -7,6 +7,7 @@
 - PHP 8.0 或更高版本，并启用项目所需扩展（至少 PDO 及对应数据库驱动）
 - Composer 2
 - MySQL 5.7+ 或兼容数据库
+- Redis 3+；项目默认使用 Redis 缓存，PHP 未启用 `ext-redis` 时由 Composer 安装的 Predis 提供客户端
 
 ## 本地启动
 
@@ -15,7 +16,7 @@ composer install
 cp .example.env .env
 ```
 
-在 `.env` 中填写数据库连接，再将 Web 服务器站点根目录指向项目的 `public/`。本地也可用 ThinkPHP 内置服务器：
+在 `.env` 中填写数据库连接，再将 Web 服务器站点根目录指向项目的 `public/`。Apache 需要启用 `mod_rewrite` 并允许站点目录使用 `.htaccess`；本地也可用 ThinkPHP 内置服务器：
 
 ```bash
 php think run
@@ -28,7 +29,7 @@ php database/migrate.php status
 php database/migrate.php up
 ```
 
-首次部署、环境变量、数据库迁移和 Nginx 配置见 [doce/项目初始化部署文档.md](doce/项目初始化部署文档.md)。
+首次部署、环境变量、数据库迁移和 Nginx 配置见 [docs/项目初始化部署文档.md](docs/项目初始化部署文档.md)。
 
 示例租户健康检查：`GET /api/sample/v1/health`。预期返回统一 JSON 格式。生产环境请关闭调试、禁止 Web 访问项目根目录，并通过 HTTPS 提供服务。
 
@@ -42,11 +43,11 @@ php database/migrate.php up
 
 ## 目录结构
 
-目录说明见 [doce/目录结构说明.md](doce/目录结构说明.md)，初始化部署见 [doce/项目初始化部署文档.md](doce/项目初始化部署文档.md)，接口、隔离、认证、测试和发布要求见 [docs/项目开发规范.md](docs/项目开发规范.md)。
+目录说明见 [doce/目录结构说明.md](doce/目录结构说明.md)，项目操作与部署见 [docs/项目初始化部署文档.md](docs/项目初始化部署文档.md)，接口、隔离、认证、测试和发布要求见 [docs/项目开发规范.md](docs/项目开发规范.md)。完整文档入口见 [docs/项目文档索引.md](docs/项目文档索引.md)。
 
-公共接口、数据库设计、兼容迁移和联调验收见 [api/common.md](api/common.md)；接口文档入口见 [api/README.md](api/README.md)。`api/upload.md` 已同步当前图片固定目录、审核状态和公开 URL 规则，`api/user.md` 保留旧客户端路径和字段的兼容说明。
+公共接口、数据库设计、兼容迁移和联调验收见 [api/common.md](api/common.md)；接口文档入口见 [api/README.md](api/README.md)。各小程序业务接口按 `api/{programKey}/` 分目录维护；`api/upload.md` 和 `api/user.md` 保留公共兼容说明。“今天要做什么饭”业务的 SQL 与开发状态见 [小程序更新文档](doce/今天要做什么饭开发更新说明.md)。
 
 ## 当前边界
 
-模板包含项目注册、路由隔离、Token 认证、微信登录适配、图片固定目录存储和按项目分区日志，但这不等于完整的业务授权系统。本模板不是完整的微信开放平台 SDK，也没有预置 RBAC、支付或内容安全审核服务。接入真实项目时，必须按开发规范补充认证授权、审核策略、日志保留和数据隔离，不能只检查是否携带任意 Token。
+模板包含项目注册、路由隔离、Token 认证、基于 EasyWeChat 的微信登录适配、图片固定目录存储和按项目分区日志，但这不等于完整的业务授权系统。本模板不是完整的微信开放平台 SDK，也没有预置 RBAC、支付或内容安全审核服务。接入真实项目时，必须按开发规范补充认证授权、审核策略、日志保留和数据隔离，不能只检查是否携带任意 Token。
 

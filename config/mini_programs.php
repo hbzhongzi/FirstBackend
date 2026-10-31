@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 /**
- * 小程序/业务租户注册表。只放非敏感元数据；微信密钥必须来自环境变量或密钥管理服务。
+ * 小程序/业务租户路由白名单。公开 AppID 和加密 AppSecret 统一从 sys_mini_program 读取。
  */
 return [
     'programs' => [
@@ -10,8 +10,6 @@ return [
         'sample' => [
             'name'          => '示例小程序',
             'enabled'       => true,
-            'appid_env'     => 'WECHAT_SAMPLE_APPID',
-            'secret_env'    => 'WECHAT_SAMPLE_SECRET',
             'features'      => [],
         ],
     ],

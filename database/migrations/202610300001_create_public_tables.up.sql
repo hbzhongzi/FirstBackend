@@ -1,10 +1,11 @@
 -- 公共表迁移：小程序注册信息。
--- program_key 是 URL 和代码中的稳定项目标识，appid 仅保存公开 AppID。
+-- program_key 是 URL 和代码中的稳定项目标识，AppSecret 使用 APP_KEY 加密后保存。
 CREATE TABLE IF NOT EXISTS `{{prefix}}sys_mini_program` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT COMMENT '小程序内部主键',
   `program_key` VARCHAR(64) NOT NULL COMMENT '小程序稳定标识，用于 API 路径和代码命名',
   `name` VARCHAR(128) NOT NULL COMMENT '小程序显示名称',
   `appid` VARCHAR(64) NOT NULL COMMENT '微信小程序 AppID，不是 AppSecret',
+  `secret_ciphertext` VARBINARY(1024) NULL COMMENT '微信 AppSecret 加密密文，不保存明文',
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1 启用，0 停用',
   `config_ref` VARCHAR(128) NULL COMMENT '密钥管理系统配置引用',
   `created_at` DATETIME NOT NULL COMMENT '创建时间',

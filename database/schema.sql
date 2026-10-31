@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `sys_mini_program` (
   `program_key` VARCHAR(64) NOT NULL COMMENT '小程序稳定标识，用于 API 路径和代码命名',
   `name` VARCHAR(128) NOT NULL COMMENT '小程序显示名称',
   `appid` VARCHAR(64) NOT NULL COMMENT '微信小程序 AppID，不是 AppSecret',
+  `secret_ciphertext` VARBINARY(1024) NULL COMMENT '微信 AppSecret 加密密文，不保存明文',
   `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态：1 启用，0 停用',
   `config_ref` VARCHAR(128) NULL COMMENT '密钥管理系统配置引用',
   `created_at` DATETIME NOT NULL COMMENT '创建时间',

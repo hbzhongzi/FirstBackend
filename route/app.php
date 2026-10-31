@@ -6,10 +6,15 @@ use app\common\controller\v1\Bootstrap;
 use app\common\controller\v1\File;
 use app\common\controller\v1\Health;
 use app\common\controller\v1\User;
+use app\common\controller\Index;
 use app\common\response\ApiResponse;
 use app\middleware\Authenticate;
 use app\middleware\ResolveMiniProgram;
 use think\facade\Route;
+
+// 项目根路径使用现有公共入口控制器，避免 ThinkPHP 按默认约定查找 app\controller\Index。
+Route::get('/', [Index::class, 'index']);
+Route::get('hello/<name?>', [Index::class, 'hello']);
 
 // 公共接口为每个已注册小程序生成同一套路由；业务接口继续放在各项目路由文件中。
 foreach (array_keys(config('mini_programs.programs', [])) as $programKey) {

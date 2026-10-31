@@ -36,7 +36,7 @@ final class Authenticate
 
     private function readToken(Request $request): string
     {
-        $authorization = trim((string) $request->header('authorization', ''));
+        $authorization = $this->readAuthorization($request);
         if (preg_match('/^Bearer\s+(.+)$/i', $authorization, $matches)) {
             return trim($matches[1]);
         }
@@ -48,5 +48,34 @@ final class Authenticate
         }
 
         return $token;
+    }
+
+    /**
+     * Apache + mod_fcgid 在重写请求后可能将 Authorization 放到
+     * REDIRECT_HTTP_AUTHORIZATION；兼容两种 CGI 变量名称。
+     */
+    private function readAuthorization(Request $request): string
+    {
+        $authorization = trim((string) $request->header('authorization', ''));
+        if ($authorization !== '') {
+            return $authorization;
+        }
+
+        foreach (['HTTP_AUTHORIZATION', 'REDIRECT_HTTP_AUTHORIZATION'] as $key) {
+            $value = trim((string) $request->server($key, ''));
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        if (function_exists('getallheaders')) {
+            foreach ((array) getallheaders() as $name => $value) {
+                if (strcasecmp((string) $name, 'Authorization') === 0) {
+                    return trim((string) $value);
+                }
+            }
+        }
+
+        return '';
     }
 }
