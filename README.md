@@ -13,10 +13,9 @@
 
 ```bash
 composer install
-cp .example.env .env
 ```
 
-在 `.env` 中填写数据库连接，再将 Web 服务器站点根目录指向项目的 `public/`。Apache 需要启用 `mod_rewrite` 并允许站点目录使用 `.htaccess`；本地也可用 ThinkPHP 内置服务器：
+当前仓库不提交包含环境值的 `.example.env`。请由部署系统创建 `.env`，按下方综合部署文档填写数据库、Redis 和 `APP_KEY`，再将 Web 服务器站点根目录指向项目的 `public/`。Apache 需要启用 `mod_rewrite` 并允许站点目录使用 `.htaccess`；本地也可用 ThinkPHP 内置服务器：
 
 ```bash
 php think run
@@ -30,6 +29,8 @@ php database/migrate.php up
 ```
 
 首次部署、环境变量、数据库迁移和 Nginx 配置见 [docs/项目初始化部署文档.md](docs/项目初始化部署文档.md)。
+
+“今天吃什么”项目从数据库注册、微信密钥、业务 seed 到线上验收的完整操作见 [docs/今天吃什么项目落地与线上部署操作说明.md](docs/今天吃什么项目落地与线上部署操作说明.md)。
 
 示例租户健康检查：`GET /api/sample/v1/health`。预期返回统一 JSON 格式。生产环境请关闭调试、禁止 Web 访问项目根目录，并通过 HTTPS 提供服务。
 
